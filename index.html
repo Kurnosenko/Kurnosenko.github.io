@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Мини-игра на A-Frame</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script>
+        AFRAME.registerComponent('collectable', {
+            init: function () {
+                this.el.addEventListener('click', (event) => {
+                    const score = document.querySelector('#score');
+                    score.setAttribute('value', parseInt(score.getAttribute('value')) + 1);
+                    this.spawnBall();
+                    this.el.setAttribute('visible', false);
+                });
+            },
+            spawnBall: function() {
+                setTimeout(() => {
+                    const sphere = document.createElement('a-sphere');
+                    sphere.setAttribute('radius', Math.random() * 0.5 + 0.5);
+                    sphere.setAttribute('color', '#' + Math.floor(Math.random() * 16777215).toString(16));
+                    sphere.setAttribute('position', `${Math.random() * 10 - 5} ${1} ${Math.random() * 10 - 5}`);
+                    sphere.setAttribute('collectable', '');
+                    document.querySelector('a-scene').appendChild(sphere);
+                }, 5000);
+            }
+        });
+
+        let timeLeft = 60; 
+        let timerElement; 
+
+        function startGame() {
+            timeLeft = 60; 
+            timerElement = document.querySelector('#timer'); 
+            timerElement.setAttribute('value', 'Time: ' + timeLeft); 
+            setInterval(updateTimer, 1000);
+            spawnInitialBalls();
+        }
+
+        function spawnInitialBalls() {
+            for (let i = 0; i < 5; i++) {
+                const sphere = document.createElement('a-sphere');
+                sphere.setAttribute('radius', Math.random() * 0.5 + 0.5);
+                sphere.setAttribute('color', '#' + Math.floor(Math.random() * 16777215).toString(16));
+                sphere.setAttribute('position', `${Math.random() * 10 - 5} ${1} ${Math.random() * 10 - 5}`);
+                sphere.setAttribute('collectable', '');
+                document.querySelector('a-scene').appendChild(sphere);
+            }
+        }
+
+        function updateTimer() { 
+            if (timeLeft > 0) { 
+                timeLeft--; 
+                timerElement.setAttribute('value', 'Time: ' + timeLeft); 
+            } else { 
+                endGame(); 
+            } 
+        } 
+
+        function endGame() {
+            const score = document.querySelector('#score').getAttribute('value');
+            const message = document.createElement('a-text');
+            message.setAttribute('value', `Игра окончена! Ваш счет: ${score}`); 
+            message.setAttribute('position', '0 2 0'); 
+            message.setAttribute('color', '#ff0000'); 
+            message.setAttribute('scale', '1 1 1'); 
+            document.querySelector('a-scene').appendChild(message);
+        }
+
+        window.onload = startGame;
+
+    </script>
+</head>
+<body>
+    <a-scene>
+        <a-sky color="#87CEEB"></a-sky>
+        <a-plane rotation="-90 0 0" width="100" height="100" color="#A9A9A9"></a-plane>
+        <a-entity camera wasd-controls look-controls position="0 1.6 0" id="player"></a-entity>
+        <a-entity cursor="rayOrigin: mouse"></a-entity> 
+
+        <a-text id="score" value="0" position="-4 3 0" color="#000"></a-text>
+        <a-text id="timer" value="60 сек" position="4 3 0" color="#000"></a-text>
+        
+        <!-- Добавление 3D модели -->
+         <a-assets>
+            <a-assets-irem id="tree-obj" src=""></a-assets-irem>
+         </a-assets>
+
+         <a-enity giltf-model="#tree-obj" position="0 1.6 -3"></a-enity>
+      
+    </a-scene>
+</body>
+</html>
